@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import Restaurant from "../models/restaurant";
 import cloudinary from "cloudinary";
 import mongoose from "mongoose";
-import { readdirSync } from "fs";
 
 const createMyRestaurant = async (req: Request, res: Response) => {
     try{
