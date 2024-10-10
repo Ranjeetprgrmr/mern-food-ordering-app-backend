@@ -23,7 +23,7 @@ type CheckoutSessionRequest = {
 };
 
 const stripeWebhookHandler = async( req: Request, res: Response) => {
-    let event: Stripe.Event;
+    let event;
 
     try{
         const sig = req.headers["stripe-signature"];
