@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { Request, Response } from "express";
 import Restaurant, { MenuItemType } from "../models/restaurant";
 import Order from "../models/order";
+import getRawBody from "raw-body";
 
 const STRIPE = new Stripe(process.env.STRIPE_API_KEY as string);
 const FRONTEND_URL = process.env.FRONTEND_URL as string;
@@ -27,8 +28,9 @@ const stripeWebhookHandler = async( req: Request, res: Response) => {
 
     try{
         const sig = req.headers["stripe-signature"];
+        const rawBody = await getRawBody(req);
         event = STRIPE.webhooks.constructEvent(
-            req.body,
+            rawBody,
             sig as string,
             STRIPE_ENDPOINT_SECRET
         );
@@ -37,7 +39,7 @@ const stripeWebhookHandler = async( req: Request, res: Response) => {
         return res.status(400).send(`Webhook error: ${error.message}`);
     }
     if(event.type === "checkout.session.completed"){
-        const order = await Order.findById(event?.data.object.metadata?.orderId);
+        const order = await Order.findById(event.data.object.metadata?.orderId);
 
         if(!order) {
             return res.status(404).json({ message: "Order not found" });
